@@ -10,7 +10,7 @@ import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.testkit.TestActorRef;
 
-public class ExmpleTest1 {
+public class ExampleTest1 {
 
 	private static class MyActor extends UntypedActor {
 		public void onReceive(Object msg) throws Exception {
@@ -39,7 +39,7 @@ public class ExmpleTest1 {
 	public void testUnderlyingActor() {
 		TestActorRef<MyActor> ref = TestActorRef.create(system, Props.create(MyActor.class), "testA");
 
-		MyActor actor = (MyActor) ref.underlyingActor();
+		MyActor actor = ref.underlyingActor();
 
 		Assert.assertTrue(actor.testMe());
 	}
