@@ -1,7 +1,5 @@
 package com.exactprosystems.meetup;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -14,14 +12,11 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.testkit.JavaTestKit;
-import akka.testkit.TestProbe;
-import scala.collection.JavaConverters;
-import scala.collection.Seq;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
 public class ExampleTest3 {
-	
+
 	private static final FiniteDuration TIMEOUT = Duration.apply(1, TimeUnit.SECONDS);
 
 	private static class MyActor extends UntypedActor {
@@ -45,28 +40,57 @@ public class ExampleTest3 {
 
 	@Test
 	public void testPingPong() {
-		ActorRef actor = system.actorOf(Props.create(MyActor.class), "pingpong");
 		
-		TestProbe probe = TestProbe.apply(system);
-		JavaTestKit tk = new JavaTestKit(system);
-		
-		String response = null;
-		
-		// Expect Msg
-		actor.tell("Hello!", probe.ref());
-		response = probe.expectMsg(TIMEOUT, "Hello!");
-		Assert.assertEquals("Hello!", response);
-		
-		// Expect Msg Any Of
-		actor.tell("Hello!", probe.ref());
-		
-		List<String> expectedValues = Arrays.asList("Hello!", "World!");
-		Seq<String> expectedValuesScala = JavaConverters.asScalaBufferConverter(expectedValues).asScala();
-		
-		response = probe.expectMsgAnyOf(TIMEOUT, expectedValuesScala);
-		Seq<Object> resp = probe.receiveN(5);
+		new JavaTestKit(this.system) {{
 
-		Assert.assertEquals("Hello!", response);
+			// Create Actor
+			ActorRef actor = system.actorOf(Props.create(MyActor.class), "pingpong");
+			
+			// 1. expectMsgEquals()
+			actor.tell("Hello!", getRef());
+
+			String strResponse = expectMsgEquals(TIMEOUT, "Hello!");
+			
+			Assert.assertEquals("Hello!", strResponse);
+			
+			
+			// 2. expectMsgAnyOf()
+			actor.tell("Hello!", getRef());
+
+			Object response = expectMsgAnyOf(TIMEOUT, "Hello!", "World!");
+
+			Assert.assertEquals("Hello!", response);
+			
+			
+			// 3. expectMsgAllOf()
+			actor.tell("Hello!", getRef());
+			actor.tell("World!", getRef());
+			
+			Object[] responses = expectMsgAllOf(TIMEOUT, "Hello!", "World!");
+
+			Assert.assertEquals("Hello!", responses[0]);
+			Assert.assertEquals("World!", responses[1]);
+			
+			
+			// 4. expectMsgEquals()
+			actor.tell("Hello!", getRef());
+			
+			strResponse = expectMsgClass(TIMEOUT, String.class);
+
+			Assert.assertEquals("Hello!", strResponse);
+			
+			
+			// 5. Expect No Msg
+			expectNoMsg(TIMEOUT);
+			
+			// Expect No Msg
+			actor.tell("Hello!", getRef());
+			actor.tell("World!", getRef());
+
+			responses = receiveN(2);
+		}};
+		
+		
 	}
 
 }

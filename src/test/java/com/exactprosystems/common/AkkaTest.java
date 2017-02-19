@@ -67,7 +67,7 @@ public abstract class AkkaTest {
 	}
 
 	public void checkUnhandled() {
-		Assert.assertEquals(0, this.unhandledMessages.underlyingActor().getUnhandledMessage().size());
+		Assert.assertEquals(0, this.unhandledMessages.underlyingActor().getUnhandled().size());
 		Assert.assertEquals(0, this.deadLetters.underlyingActor().getDeadLetters().size());
 	}
 }

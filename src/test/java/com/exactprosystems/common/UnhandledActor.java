@@ -27,7 +27,7 @@ public class UnhandledActor extends UntypedActor {
 		}
 	}
 
-	public List<UnhandledMessage> getUnhandledMessage() {
+	public List<UnhandledMessage> getUnhandled() {
 		return unhandled;
 	}
 	
