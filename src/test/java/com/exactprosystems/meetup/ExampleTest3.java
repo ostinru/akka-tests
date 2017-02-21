@@ -40,57 +40,49 @@ public class ExampleTest3 {
 
 	@Test
 	public void testPingPong() {
-		
-		new JavaTestKit(this.system) {{
+		JavaTestKit tk = new JavaTestKit(this.system);
 
-			// Create Actor
-			ActorRef actor = system.actorOf(Props.create(MyActor.class), "pingpong");
-			
-			// 1. expectMsgEquals()
-			actor.tell("Hello!", getRef());
+		// Create Actor
+		ActorRef actor = system.actorOf(Props.create(MyActor.class), "pingpong");
 
-			String strResponse = expectMsgEquals(TIMEOUT, "Hello!");
-			
-			Assert.assertEquals("Hello!", strResponse);
-			
-			
-			// 2. expectMsgAnyOf()
-			actor.tell("Hello!", getRef());
+		// 1. expectMsgEquals()
+		actor.tell("Hello!", tk.getRef());
 
-			Object response = expectMsgAnyOf(TIMEOUT, "Hello!", "World!");
+		String strResponse = tk.expectMsgEquals(TIMEOUT, "Hello!");
 
-			Assert.assertEquals("Hello!", response);
-			
-			
-			// 3. expectMsgAllOf()
-			actor.tell("Hello!", getRef());
-			actor.tell("World!", getRef());
-			
-			Object[] responses = expectMsgAllOf(TIMEOUT, "Hello!", "World!");
+		Assert.assertEquals("Hello!", strResponse);
 
-			Assert.assertEquals("Hello!", responses[0]);
-			Assert.assertEquals("World!", responses[1]);
-			
-			
-			// 4. expectMsgEquals()
-			actor.tell("Hello!", getRef());
-			
-			strResponse = expectMsgClass(TIMEOUT, String.class);
+		// 2. expectMsgAnyOf()
+		actor.tell("Hello!", tk.getRef());
 
-			Assert.assertEquals("Hello!", strResponse);
-			
-			
-			// 5. Expect No Msg
-			expectNoMsg(TIMEOUT);
-			
-			// Expect No Msg
-			actor.tell("Hello!", getRef());
-			actor.tell("World!", getRef());
+		Object response = tk.expectMsgAnyOf(TIMEOUT, "Hello!", "World!");
 
-			responses = receiveN(2);
-		}};
-		
-		
+		Assert.assertEquals("Hello!", response);
+
+		// 3. expectMsgAllOf()
+		actor.tell("Hello!", tk.getRef());
+		actor.tell("World!", tk.getRef());
+
+		Object[] responses = tk.expectMsgAllOf(TIMEOUT, "Hello!", "World!");
+
+		Assert.assertEquals("Hello!", responses[0]);
+		Assert.assertEquals("World!", responses[1]);
+
+		// 4. expectMsgEquals()
+		actor.tell("Hello!", tk.getRef());
+
+		strResponse = tk.expectMsgClass(TIMEOUT, String.class);
+
+		Assert.assertEquals("Hello!", strResponse);
+
+		// 5. Expect No Msg
+		tk.expectNoMsg(TIMEOUT);
+
+		// Expect No Msg
+		actor.tell("Hello!", tk.getRef());
+		actor.tell("World!", tk.getRef());
+
+		responses = tk.receiveN(2);
 	}
 
 }
